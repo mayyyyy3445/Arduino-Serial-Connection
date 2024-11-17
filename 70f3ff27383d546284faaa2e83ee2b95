@@ -1,0 +1,35 @@
+int photoResistorPin = A0;   
+int ledPin = 13;   
+
+int brightnessThreshold = 220;   
+bool blinking = false;   
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+   int brightnessValue = analogRead(photoResistorPin);
+
+   if (brightnessValue >= brightnessThreshold) {
+    blinking = true;   
+  }
+
+   if (blinking) {
+    digitalWrite(ledPin, HIGH);
+    delay(100);
+    digitalWrite(ledPin, LOW);
+    delay(100);
+  }
+
+   if (Serial.available() > 0) {
+    String input = Serial.readStringUntil('\n');
+    input.trim();   
+
+     if (input.equalsIgnoreCase("stop")) {
+      blinking = false;  // Stop blinking if "stop" or "STOP" is entered
+      digitalWrite(ledPin, LOW);  // Turn off the LED
+    }
+  }
+}

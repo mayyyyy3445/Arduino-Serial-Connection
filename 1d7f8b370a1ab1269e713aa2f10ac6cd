@@ -1,0 +1,42 @@
+const int ledPin = 13;           
+const int threshold = 180;       
+bool shouldBlink = false;       
+
+void setup() {
+  pinMode(ledPin, OUTPUT);      
+  Serial.begin(9600);           
+}
+
+void loop() {
+  int rawBrightness = analogRead(A0);     // Read raw brightness level (0-1023)
+  int brightness = map(rawBrightness, 0, 1023, 0, 200); 
+
+  // Print the mapped brightness level to the Serial Monitor
+  Serial.print("Mapped Brightness Level: ");
+  Serial.println(brightness);
+
+  // Check if brightness meets or exceeds the threshold
+  if (brightness >= threshold) {
+    shouldBlink = true;          // Set flag to start blinking
+  }
+
+  // Blink the LED if the flag is set
+  if (shouldBlink) {
+    digitalWrite(ledPin, LOW);  // Turn on the LED
+    delay(100);                  // Wait 100 milliseconds
+    digitalWrite(ledPin, HIGH);   // Turn off the LED
+    delay(100);                  // Wait another 100 milliseconds
+  }
+
+  // Check for serial input to stop blinking
+  if (Serial.available() > 0) {
+    String input = Serial.readString();  // Read serial input
+    input.trim();                        // Remove any whitespace
+
+    // Stop blinking if the input is "stop"
+    if (input.equalsIgnoreCase("stop")) {
+      shouldBlink = false;
+      digitalWrite(ledPin, HIGH);         // Turn off the LED
+    }
+  }
+}
